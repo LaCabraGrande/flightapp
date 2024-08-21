@@ -23,14 +23,20 @@ import java.util.*;
  */
 public class FlightReader {
 
+    static List<DTOs.FlightInfo> flightInfoList;
+
     public static void main(String[] args) {
         FlightReader flightReader = new FlightReader();
         try {
             List<DTOs.FlightDTO> flightList = flightReader.getFlightsFromFile("flights.json");
-            List<DTOs.FlightInfo> flightInfoList = flightReader.getFlightInfoDetails(flightList);
+            flightInfoList = flightReader.getFlightInfoDetails(flightList);
             flightInfoList.forEach(f->{
                 System.out.println("\n"+f);
             });
+
+            flightReader.airLineAvg("Lufthansa");
+            flightReader.airLineTotal("Lufthansa");
+
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -67,6 +73,29 @@ public class FlightReader {
 
         List<DTOs.FlightDTO> flightList = Arrays.stream(flights).toList();
         return flightList;
+    }
+
+    public double airLineAvg (String airLine){
+        double averageForLufthansa = flightInfoList.stream()
+                .filter(flightInfo -> airLine.equals(flightInfo.getAirline()))
+                .mapToDouble(flightInfo -> flightInfo.getDuration().toHours())
+                .average()
+                .orElse(0.0);
+
+        System.out.println("\n \nGennemsnitlig tid for " + airLine + " flytider er " + averageForLufthansa + " timer.");
+
+        return averageForLufthansa;
+    }
+
+    public double airLineTotal (String airLine){
+        double totalForLufthansa = flightInfoList.stream()
+                .filter(flightInfo -> airLine.equals(flightInfo.getAirline()))
+                .mapToDouble(flightInfo -> flightInfo.getDuration().toHours())
+                .sum();
+
+        System.out.println("\n \nTotal tid for " + airLine + " flytider er " + totalForLufthansa + " timer.");
+
+        return totalForLufthansa;
     }
 
 
